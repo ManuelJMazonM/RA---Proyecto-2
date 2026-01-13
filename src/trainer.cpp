@@ -6,11 +6,12 @@ vector<vector<double>> Trainer::computeDeltas(NeuralNetwork& nn, const vector<do
 	int num_layers = nn.layers.size();
 	vector<vector<double>> deltas(num_layers); 
 
-	int L = num_layers -1; 
+	//Output layer
+	int L = num_layers - 1; 
 	int num_neurons_L = nn.layers[L].neurons.size(); 
 	deltas[L].resize(num_neurons_L);
 
-	for (int j=0; j < num_neurons; ++j){
+	for (int j=0; j < num_neurons_L; ++j){
 		double x_j_L = nn.layers[L].last_outputs[j]; //¿Puede acceder a esta variable?
 		double error_derivative = 2.0 * (x_j_L - target[j]);
 		double theta_prime = Activations::applyDerivative(x_j_L, activation);
@@ -18,7 +19,7 @@ vector<vector<double>> Trainer::computeDeltas(NeuralNetwork& nn, const vector<do
 		deltas[L][j] = theta_prime * error_derivative;
 	}
 
-	for (int l = L -1; l >= 0; --l){
+	for (int l = L - 1; l >= 0; --l){
 		int num_neurons_l = nn.layers[l].neurons.size();
 		deltas[l].resize(num_neurons_l);
 
@@ -40,6 +41,28 @@ vector<vector<double>> Trainer::computeDeltas(NeuralNetwork& nn, const vector<do
 }
 
 
+void Trainer::applyGradients(NeuralNetwork& nn, const std::vector<std::vector<double>>& deltas, double eta){
+
+	for (size_t l=0; l < nn.layers.size(); ++l){
+		Layer& layer = nn.layers[l];
+
+		for (size_t j=0; j < layer.neurons.size(); ++j){
+			Perceptron& neuron = layer.neurons[j];
+			double delta_j = deltas[l][j];
+
+			for (size_t k=0; k < neuron.weights.size(); ++k){
+				double x_k = layer.last_inputs[k];
+
+				neuron.weights[k] -= eta * deltaj * x_k;
+			}
+
+			neuron.bias -= eta * delta_j * 1.0;
+		}
+	}
+}
+
+
+//Entrenamiento de la red neuronal con backpropagation
 void Trainer::train(
     NeuralNetwork& nn,
     const vector<vector<double>>& data,
