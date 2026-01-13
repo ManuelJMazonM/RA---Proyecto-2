@@ -1,32 +1,38 @@
-.PHONY = clean all
+.PHONY: clean all
 
 VPATH=src
 BUILD_DIR:=build
 TEST_DIR:=test
 FLAGS:=-g -Wall -Werror
 
+OBJ_DIR:=$(BUILD_DIR)/obj
+
 TARGETS:=common perceptron layer neuralnetwork trainer
 SOURCES:=$(addsuffix .cpp, $(TARGETS))
-OBJECTS:=$(addsuffix $(BUILD_DIR)/, $(SOURCES:.cpp=.o))
+OBJECTS:=$(addprefix $(OBJ_DIR), $(SOURCES:.cpp=.o))
 OUT_LIB:=$(BUILD_DIR)/libneuralnetwork.so
 TEST:= #TODO: here enumerate the test executables
 
-_TARGETS:=$(addprefix $(BUILD_DIR)/, $(EXECUTABLES))
 
-all: $(BUILD_DIR) $(OUT_LIB) $(TEST_DIR) $(TEST)
+all: lib tests
 
-shared_object: $(BUILD_DIR) $(OUT_LIB)
+lib: build_dirs $(OUT_LIB)
+
+build_dirs:
+	mkdir -p $(OBJ_DIR)
 
 
-#TODO: todavia el makefile esta incompleto
+TEST=$(addprefix $(TEST_DIR), $(TEST))
+test: lib
+	#TODO: a loop that compiles and executes tests
 
-$(BUILD_DIR):
-	mkdir -p $@
 
-$(TEST_DIR):
-	mkdir -p $@
+$(OBJ_DIR)/%.o: %.cpp:
+	g++ $(FLAGS) -fPIC -c $< -o $@
 
-$(TARGETS): %.cpp:
+
+$(OUT_LIB): $(OBJECTS)
+	g++ -shared $^ -o $@
 
 
 clean:
