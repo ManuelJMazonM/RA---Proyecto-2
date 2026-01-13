@@ -6,12 +6,11 @@
 
 class NeuralNetwork {
 public:
-    std::vector<Layer> layers;
+  vector<Layer> layers;
+  ActivationType activation_type;
 
-    NeuralNetwork(
-        const std::vector<int>& topology,
-        const ActivationType activation_type);
-    std::vector<double> predict(const std::vector<double>& inputs, ActivationType activation);
+  NeuralNetwork(const vector<int>& topology, const ActivationType activation_type);
+  vector<double> predict(const vector<double>& inputs);
 };
 
 #endif
