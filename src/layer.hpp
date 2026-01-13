@@ -11,7 +11,7 @@ public:
     std::vector<double> last_outputs;
 
     Layer(int num_neurons, int inputs_per_neuron);
-    std::vector<double> forward(const std::vector<double>& inputs, ActivationType activation);
+    std::vector<double> forward(const std::vector<double>& inputs, const ActivationType activation);
 };
 
 #endif

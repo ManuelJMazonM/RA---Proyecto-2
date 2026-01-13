@@ -22,10 +22,9 @@ build_dirs:
 	mkdir -p $(OBJ_DIR)
 
 
+#TODO: a loop that compiles and executes tests (inside bulid dir)
 #TEST=$(addprefix $(TEST_DIR), $(TEST))
 #tests: lib
-	#TODO: a loop that compiles and executes tests
-	#TODO: the tests should be compiled inside test dir to link against to link against libneuralnetwork
 
 
 $(OBJ_DIR)/%.o: %.cpp

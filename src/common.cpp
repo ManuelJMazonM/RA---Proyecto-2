@@ -2,8 +2,7 @@
 #include <algorithm>
 
 namespace Activations {
-	//Funciones de Activación
-	double apply(double s, ActivationType type){
+	double apply(double s, ActivationType type) {
 		switch (type){
 		case ActivationType::SIGMOID:
 			return 1.0 / (1.0 + std::exp(-s));
@@ -18,9 +17,7 @@ namespace Activations {
 		}
 	}
 
-
-	//Derivadas
-	double applyDerivative(double f_s, ActivationType type){
+	double applyDerivative(double f_s, ActivationType type) {
 		switch (type){
 		case ActivationType::SIGMOID:
 			return f_s * (1.0 - f_s);

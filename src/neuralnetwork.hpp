@@ -4,6 +4,8 @@
 #include "perceptron.hpp"
 #include "layer.hpp"
 
+using std::vector;
+
 class NeuralNetwork {
 public:
   vector<Layer> layers;

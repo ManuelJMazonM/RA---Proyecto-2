@@ -2,36 +2,43 @@
 #include "common.hpp"
 #include <iostream>
 
-vector<vector<double>> Trainer::computeDeltas(NeuralNetwork& nn, const vector<double>& target, ActivationType activation){
+using std::cout;
+using std::cerr;
+using std::abs;
+
+
+vector<vector<double>> Trainer::computeDeltas(NeuralNetwork& nn, const vector<double>& target)
+{
 	int num_layers = nn.layers.size();
 	vector<vector<double>> deltas(num_layers); 
 
-	//Output layer
-	int L = num_layers - 1; 
+	int L = num_layers -1;
 	int num_neurons_L = nn.layers[L].neurons.size(); 
 	deltas[L].resize(num_neurons_L);
 
-	for (int j=0; j < num_neurons_L; ++j){
-		double x_j_L = nn.layers[L].last_outputs[j]; //¿Puede acceder a esta variable?
+	for (int j=0; j < num_neurons_L; ++j)
+  {
+		double x_j_L = nn.layers[L].last_outputs[j];
 		double error_derivative = 2.0 * (x_j_L - target[j]);
-		double theta_prime = Activations::applyDerivative(x_j_L, activation);
+		double theta_prime = Activations::applyDerivative(x_j_L, nn.activation_type);
 
 		deltas[L][j] = theta_prime * error_derivative;
 	}
 
-	for (int l = L - 1; l >= 0; --l){
+	for (int l = L -1; l >= 0; l--)
+  {
 		int num_neurons_l = nn.layers[l].neurons.size();
 		deltas[l].resize(num_neurons_l);
 
 		for (int i=0; i < num_neurons_l; ++i){
 			double sum_deltas_next = 0.0;
 
-			for (int j=0; j < nn.layers[l+1].neurons.size(); ++j){
+			for (size_t j=0; j < nn.layers[l+1].neurons.size(); ++j){
 				sum_deltas_next += nn.layers[l+1].neurons[j].weights[i] * deltas[l+1][j];
 			}
 
 			double x_i_l = nn.layers[l].last_outputs[i];
-			double theta_prime = Activations::applyDerivative(x_i_l, activation);
+			double theta_prime = Activations::applyDerivative(x_i_l, nn.activation_type);
 
 			deltas[l][i] = theta_prime * sum_deltas_next;
 		}
@@ -53,7 +60,7 @@ void Trainer::applyGradients(NeuralNetwork& nn, const std::vector<std::vector<do
 			for (size_t k=0; k < neuron.weights.size(); ++k){
 				double x_k = layer.last_inputs[k];
 
-				neuron.weights[k] -= eta * deltaj * x_k;
+				neuron.weights[k] -= eta * delta_j * x_k;
 			}
 
 			neuron.bias -= eta * delta_j * 1.0;
@@ -62,21 +69,18 @@ void Trainer::applyGradients(NeuralNetwork& nn, const std::vector<std::vector<do
 }
 
 
-//Entrenamiento de la red neuronal con backpropagation
 void Trainer::train(
     NeuralNetwork& nn,
     const vector<vector<double>>& data,
 		const vector<vector<double>>& targets,
-    int epochs,
-    ActivationType activation)
+    const int epochs)
 {
-	for (int e=0; e < epochs; ++e){
-		double total_error = 0.0;
-
-		for (size_t i=0; i < data_size(); ++i){
-			nn.predict(data[i], activation);
-			vector<vector<double>> deltas = computeDeltas(nn, targets[i], activation);
-
+	for (int e=0; e < epochs; ++e)
+  {
+		for (size_t i=0; i < data.size(); ++i)
+    {
+			nn.predict(data[i]);
+			vector<vector<double>> deltas = computeDeltas(nn, targets[i]);
 			applyGradients(nn, deltas, this->learning_rate); 
 		}
 	}
@@ -96,7 +100,7 @@ bool Trainer::train(
         return false;
     }
 
-    int input_size = training_inputs[0].size();
+    size_t input_size = training_inputs[0].size();
     if (perceptron.weights.size() != input_size) {
         cerr << "Error: Perceptron input size doesn't match training data\n";
         return false;
@@ -116,7 +120,7 @@ bool Trainer::train(
             double error = target - prediction;
             if (abs(error) > 0.5) {
                 errors++;
-                for (int j = 0; j < input_size; ++j) {
+                for (size_t j = 0; j < input_size; ++j) {
                     perceptron.weights[j] += learning_rate * error * training_inputs[i][j];
                 }
                 perceptron.bias += learning_rate * error;

@@ -8,7 +8,7 @@ enum class ActivationType { SIGMOID, TANH, RELU, STEP };
 
 namespace Activations {
     double apply(double s, ActivationType type);
-    double applyDerivate(double f_s, ActivationType type);
+    double applyDerivative(double f_s, ActivationType type);
 }
 
 #endif
