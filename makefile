@@ -9,7 +9,7 @@ OBJ_DIR:=$(BUILD_DIR)/obj
 
 TARGETS:=common perceptron layer neuralnetwork trainer
 SOURCES:=$(addsuffix .cpp, $(TARGETS))
-OBJECTS:=$(addprefix $(OBJ_DIR), $(SOURCES:.cpp=.o))
+OBJECTS:=$(addprefix $(OBJ_DIR)/, $(SOURCES:.cpp=.o))
 OUT_LIB:=$(BUILD_DIR)/libneuralnetwork.so
 TEST:= #TODO: here enumerate the test executables
 
@@ -22,13 +22,13 @@ build_dirs:
 	mkdir -p $(OBJ_DIR)
 
 
-TEST=$(addprefix $(TEST_DIR), $(TEST))
-test: lib
+#TEST=$(addprefix $(TEST_DIR), $(TEST))
+#tests: lib
 	#TODO: a loop that compiles and executes tests
 	#TODO: the tests should be compiled inside test dir to link against to link against libneuralnetwork
 
 
-$(OBJ_DIR)/%.o: %.cpp:
+$(OBJ_DIR)/%.o: %.cpp
 	g++ $(FLAGS) -fPIC -c $< -o $@
 
 
