@@ -13,13 +13,12 @@ using std::abs;
 class Trainer{
 private:
 	double learning_rate;
+
 	vector<vector<double>> computeDeltas(NeuralNetwork& nn, const vector<double>& target, ActivationType activation);
 	void applyGradients(NeuralNetwork& nn, const vector<vector<double>>& deltas, double eta);
 
 public:
 	Trainer(double lr = 0.1) : learning_rate(lr){}
-
-  vector<vector<double>> computeDeltas(NeuralNetwork& nn, const vector<double>& target, ActivationType activation);
 
 	void train(
       NeuralNetwork& nn,
