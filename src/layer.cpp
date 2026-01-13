@@ -7,7 +7,7 @@ Layer::Layer(int num_neurons, int inputs_per_neuron){
 	}
 }
 
-std::vector<double> Layer::forward(const std::vector<double>& inputs, ActivationType activation){
+std::vector<double> Layer::forward(const std::vector<double>& inputs, const ActivationType activation){
 	this->last_inputs = inputs;  //Guardamos los valores de entrada para el entrenamiento
 
 	std::vector<double> outputs;
@@ -17,7 +17,7 @@ std::vector<double> Layer::forward(const std::vector<double>& inputs, Activation
 		//REVISAR función PREDICT  en perceptrón 
 		double output = neurons[i].predict(inputs, activation);
 
-		ouputs.push_back(output);
+		outputs.push_back(output);
 		this->last_outputs.push_back(output);
 	}
 
