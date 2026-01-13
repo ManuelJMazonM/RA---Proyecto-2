@@ -20,7 +20,7 @@ namespace Activations {
 
 
 	//Derivadas
-	double applyDerivate(double f_s, ActivationType type){
+	double applyDerivative(double f_s, ActivationType type){
 		switch (type){
 		case ActivationType::SIGMOID:
 			return f_s * (1.0 - f_s);

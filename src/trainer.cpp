@@ -1,7 +1,63 @@
 #include "trainer.hpp"
 #include "common.hpp"
 #include <iostream>
-#include <cmath>
+
+vector<vector<double>> Trainer::computeDeltas(NeuralNetwork& nn, const vector<double>& target, ActivationType activation){
+	int num_layers = nn.layers.size();
+	vector<vector<double>> deltas(num_layers); 
+
+	int L = num_layers -1; 
+	int num_neurons_L = nn.layers[L].neurons.size(); 
+	deltas[L].resize(num_neurons_L);
+
+	for (int j=0; j < num_neurons; ++j){
+		double x_j_L = nn.layers[L].last_outputs[j]; //¿Puede acceder a esta variable?
+		double error_derivative = 2.0 * (x_j_L - target[j]);
+		double theta_prime = Activations::applyDerivative(x_j_L, activation);
+
+		deltas[L][j] = theta_prime * error_derivative;
+	}
+
+	for (int l = L -1; l >= 0; --l){
+		int num_neurons_l = nn.layers[l].neurons.size();
+		deltas[l].resize(num_neurons_l);
+
+		for (int i=0; i < num_neurons_l; ++i){
+			double sum_deltas_next = 0.0;
+
+			for (int j=0; j < nn.layers[l+1].neurons.size(); ++j){
+				sum_deltas_next += nn.layers[l+1].neurons[j].weights[i] * deltas[l+1][j];
+			}
+
+			double x_i_l = nn.layers[l].last_outputs[i];
+			double theta_prime = Activations::applyDerivative(x_i_l, activation);
+
+			deltas[l][i] = theta_prime * sum_deltas_next;
+		}
+	}
+
+	return deltas; 
+}
+
+
+void Trainer::train(
+    NeuralNetwork& nn,
+    const vector<vector<double>>& data,
+		const vector<vector<double>>& targets,
+    int epochs,
+    ActivationType activation)
+{
+	for (int e=0; e < epochs; ++e){
+		double total_error = 0.0;
+
+		for (size_t i=0; i < data_size(); ++i){
+			nn.predict(data[i], activation);
+			vector<vector<double>> deltas = computeDeltas(nn, targets[i], activation);
+
+			applyGradients(nn, deltas, this->learning_rate); 
+		}
+	}
+}
 
 
 bool Trainer::train(
@@ -10,8 +66,8 @@ bool Trainer::train(
     const vector<double>& training_outputs,
     double learning_rate,
     int max_epochs,
-    ActivationType activation) {
-    
+    ActivationType activation)
+{
     if (training_inputs.empty() || training_inputs.size() != training_outputs.size()) {
         cerr << "Error: Invalid training data\n";
         return false;
@@ -86,8 +142,8 @@ bool Trainer::train(
 double Trainer::test_acc(
     NeuralNetwork& network,
     const vector<vector<double>>& test_inputs,
-    const vector<double>& test_outputs) {
-
+    const vector<double>& test_outputs)
+{
     if (network.layers.empty() || test_inputs.size() != test_outputs.size()) {
         return 0.0;
     }

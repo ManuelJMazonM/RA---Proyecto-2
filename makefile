@@ -14,7 +14,7 @@ OUT_LIB:=$(BUILD_DIR)/libneuralnetwork.so
 TEST:= #TODO: here enumerate the test executables
 
 
-all: lib tests
+all: lib #tests
 
 lib: build_dirs $(OUT_LIB)
 
