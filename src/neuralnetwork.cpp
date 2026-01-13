@@ -17,6 +17,7 @@ NeuralNetwork::NeuralNetwork(
   this->activation_type = activation_type;
 }
 
+
 vector<double> NeuralNetwork::predict(const vector<double>& input)
 {
   vector<double> output(input);

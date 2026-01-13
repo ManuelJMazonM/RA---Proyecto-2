@@ -8,7 +8,7 @@ class Layer {
 public:
     std::vector<Perceptron> neurons;
     std::vector<double> last_inputs;
-    std::vector<double> last_outputs; //TODO: Guardar para Backpropagation
+    std::vector<double> last_outputs;
 
     Layer(int num_neurons, int inputs_per_neuron);
     std::vector<double> forward(const std::vector<double>& inputs, ActivationType activation);
