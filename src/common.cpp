@@ -1,4 +1,4 @@
-#include "Common.hpp"
+#include "common.hpp"
 #include <algorithm>
 
 namespace Activations {
