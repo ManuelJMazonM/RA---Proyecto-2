@@ -39,7 +39,7 @@ $(OBJECTS): $(OBJ_DIR)/%.o: %.cpp
 
 
 $(TEST): $(BUILD_DIR)/%: %.cpp:
-	g++ $(FLAGS) $(LINKER_FLAGS) -L$(BUILD_DIR) -lneuralnetwork $< -o $@
+	g++ $(FLAGS) $(LINKER_FLAGS) -I$(INCLUDE_DIR) -L$(BUILD_DIR) -lneuralnetwork $< -o $@
 
 
 clean:
