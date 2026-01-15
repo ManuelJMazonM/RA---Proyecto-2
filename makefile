@@ -1,38 +1,45 @@
 .PHONY: clean all
 
-VPATH=src
-BUILD_DIR:=build
-TEST_DIR:=test
+VPATH=src test
 FLAGS:=-g -Wall -Werror
+LINKER_FLAGS:=-Wl,-rpath,'$$ORIGIN'
+
+BUILD_DIR:=build
+SOURCES:= common perceptron layer neuralnetwork trainer
+OUT_LIB:= libneuralnetwork.so
+TEST:= and-perceptron or-perceptron xor-nn
 
 OBJ_DIR:=$(BUILD_DIR)/obj
+OBJECTS:=$(addprefix $(OBJ_DIR)/, $(addsuffix .o, $(SOURCES)))
+OUT_LIB:=$(BUILD_DIR)/$(OUT_LIB)
+TEST:=$(addprefix $(BUILD_DIR)/, $(TEST))
+INCLUDE_DIR:=$(BUILD_DIR)/include
 
-TARGETS:=common perceptron layer neuralnetwork trainer
-SOURCES:=$(addsuffix .cpp, $(TARGETS))
-OBJECTS:=$(addprefix $(OBJ_DIR)/, $(SOURCES:.cpp=.o))
-OUT_LIB:=$(BUILD_DIR)/libneuralnetwork.so
-TEST:= #TODO: here enumerate the test executables
-
-
-all: lib #tests
 
 lib: build_dirs $(OUT_LIB)
+
+test: lib $(TEST)
+
+test-exe: lib test
+	for t in $(BUILD_DIR)/*; do ./$$t; done
+
+all: lib test test-exe
+
 
 build_dirs:
 	mkdir -p $(OBJ_DIR)
 
 
-#TODO: a loop that compiles and executes tests (inside bulid dir)
-#TEST=$(addprefix $(TEST_DIR), $(TEST))
-#tests: lib
+$(OUT_LIB): $(OBJECTS)
+	g++ -shared $^ -o $@
 
 
-$(OBJ_DIR)/%.o: %.cpp
+$(OBJECTS): $(OBJ_DIR)/%.o: %.cpp
 	g++ $(FLAGS) -fPIC -c $< -o $@
 
 
-$(OUT_LIB): $(OBJECTS)
-	g++ -shared $^ -o $@
+$(TEST): $(BUILD_DIR)/%: %.cpp:
+	g++ $(FLAGS) $(LINKER_FLAGS) -L$(BUILD_DIR) -lneuralnetwork $< -o $@
 
 
 clean:
