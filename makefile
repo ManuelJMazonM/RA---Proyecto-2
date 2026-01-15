@@ -13,8 +13,10 @@ OBJ_DIR:=$(BUILD_DIR)/obj
 OBJECTS:=$(addprefix $(OBJ_DIR)/, $(addsuffix .o, $(SOURCES)))
 OUT_LIB:=$(BUILD_DIR)/$(OUT_LIB)
 TEST:=$(addprefix $(BUILD_DIR)/, $(TEST))
-INCLUDE_DIR:=$(BUILD_DIR)/include
+INCLUDE_DIR:=src/include
 
+
+all: lib test
 
 lib: build_dirs $(OUT_LIB)
 
@@ -22,8 +24,6 @@ test: lib $(TEST)
 
 test-exe: lib test
 	for t in $(BUILD_DIR)/*; do ./$$t; done
-
-all: lib test test-exe
 
 
 build_dirs:
@@ -38,8 +38,8 @@ $(OBJECTS): $(OBJ_DIR)/%.o: %.cpp
 	g++ $(FLAGS) -fPIC -c $< -o $@
 
 
-$(TEST): $(BUILD_DIR)/%: %.cpp:
-	g++ $(FLAGS) $(LINKER_FLAGS) -I$(INCLUDE_DIR) -L$(BUILD_DIR) -lneuralnetwork $< -o $@
+$(TEST): $(BUILD_DIR)/%: %.cpp
+	g++ $(FLAGS) -I$(INCLUDE_DIR) -L$(BUILD_DIR) $< -lneuralnetwork $(LINKER_FLAGS) -o $@
 
 
 clean:

@@ -60,7 +60,7 @@ public:
       const vector<vector<double>>& training_inputs,
       const vector<double>& training_outputs,
       double learning_rate = 0.1,
-      int max_epochs = 1000,
+      int max_epochs = 20,
       ActivationType activation = ActivationType::STEP);
   
   double test_acc(
