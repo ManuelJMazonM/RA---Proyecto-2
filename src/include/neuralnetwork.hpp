@@ -10,22 +10,22 @@ enum class ActivationType { SIGMOID, TANH, RELU, STEP };
 
 class Perceptron {
 public:
-    std::vector<double> weights;
+    vector<double> weights;
     double bias;
 
     Perceptron(int input_size);
-    double predict(const std::vector<double>& inputs, ActivationType activation);
+    double predict(const vector<double>& inputs, ActivationType activation);
 };
 
 
 class Layer {
 public:
-    std::vector<Perceptron> neurons;
-    std::vector<double> last_inputs;
-    std::vector<double> last_outputs;
+    vector<Perceptron> neurons;
+    vector<double> last_inputs;
+    vector<double> last_outputs;
 
     Layer(int num_neurons, int inputs_per_neuron);
-    std::vector<double> forward(const std::vector<double>& inputs, const ActivationType activation);
+    vector<double> forward(const vector<double>& inputs, const ActivationType activation);
 };
 
 
