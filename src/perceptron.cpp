@@ -1,4 +1,3 @@
-// perceptron.cpp
 #include "perceptron.hpp"
 #include <random>
 
