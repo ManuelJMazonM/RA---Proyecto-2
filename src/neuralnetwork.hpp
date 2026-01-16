@@ -12,7 +12,9 @@ public:
   ActivationType activation_type;
 
   NeuralNetwork(const vector<int>& topology, const ActivationType activation_type);
-  vector<double> predict(const vector<double>& inputs);
+  int predict(const vector<double>& inputs);
+  int predicted_class() const;
+  vector<double> raw_output() const;
 };
 
 #endif

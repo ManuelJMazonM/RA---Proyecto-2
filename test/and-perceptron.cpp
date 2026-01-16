@@ -12,7 +12,7 @@ int main()
   Perceptron p(2);
   Trainer t;
 
-  t.train(p, dataset_in, dataset_out);
+  t.train(p, dataset_in, dataset_out, 0.1, 1000);
   double hits = 0;
   for(size_t i=0; i < dataset_out.size(); i++)
   {

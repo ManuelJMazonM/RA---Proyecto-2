@@ -1,25 +1,20 @@
 #include "layer.hpp"
 #include "common.hpp"
 
-Layer::Layer(int num_neurons, int inputs_per_neuron){
+Layer::Layer(int num_neurons, int inputs_per_neuron) : last_outputs(num_neurons) {
 	for (int i=0; i < num_neurons; ++i){
 		neurons.push_back(Perceptron(inputs_per_neuron));
 	}
 }
 
 std::vector<double> Layer::forward(const std::vector<double>& inputs, const ActivationType activation){
-	this->last_inputs = inputs;  //Guardamos los valores de entrada para el entrenamiento
+	last_inputs = inputs;
+	last_outputs.clear();
 
-	std::vector<double> outputs;
-	this->last_outputs.clear();
-
-	for (size_t i=0; i < neurons.size(); ++i){
-		//REVISAR función PREDICT  en perceptrón 
+	for (size_t i=0; i < neurons.size(); ++i) {
 		double output = neurons[i].predict(inputs, activation);
-
-		outputs.push_back(output);
-		this->last_outputs.push_back(output);
+		last_outputs.push_back(output);
 	}
 
-	return outputs;
+	return last_outputs;
 }
