@@ -8,8 +8,7 @@
 #include <map>
 
 namespace Activations {
-	//Funciones de Activación
-	double apply(double s, ActivationType type){
+	double apply(double s, ActivationType type) {
 		switch (type){
 		case ActivationType::SIGMOID:
 			return 1.0 / (1.0 + std::exp(-s));
@@ -24,9 +23,7 @@ namespace Activations {
 		}
 	}
 
-
-	//Derivadas
-	double applyDerivative(double f_s, ActivationType type){
+	double applyDerivative(double f_s, ActivationType type) {
 		switch (type){
 		case ActivationType::SIGMOID:
 			return f_s * (1.0 - f_s);
@@ -40,9 +37,6 @@ namespace Activations {
 			return 1.0;
 		}	
 	}
-<<<<<<< Updated upstream
-}
-=======
 }
 
 Dataset loadDataset(const std::string& filename, int target_col, char delimiter, bool has_header, double val_split){
@@ -105,4 +99,4 @@ Dataset loadDataset(const std::string& filename, int target_col, char delimiter,
 
 	return ds;
 }
->>>>>>> Stashed changes
+

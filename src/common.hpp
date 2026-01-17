@@ -8,12 +8,9 @@ enum class ActivationType { SIGMOID, TANH, RELU, STEP };
 
 namespace Activations {
     double apply(double s, ActivationType type);
-    double applyDerivate(double f_s, ActivationType type);
+    double applyDerivative(double f_s, ActivationType type);
 }
 
-<<<<<<< Updated upstream
-#endif
-=======
 struct Dataset{
     std::vector<std::vector<double>> train_inputs;
     std::vector<std::vector<double>> train_targets;
@@ -23,4 +20,3 @@ struct Dataset{
 }
 
 #endif
->>>>>>> Stashed changes

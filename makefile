@@ -1,39 +1,45 @@
 .PHONY: clean all
 
-VPATH=src
-BUILD_DIR:=build
-TEST_DIR:=test
+VPATH=src test
 FLAGS:=-g -Wall -Werror
+LINKER_FLAGS:=-Wl,-rpath,'$$ORIGIN'
+
+BUILD_DIR:=build
+SOURCES:= common perceptron layer neuralnetwork trainer
+OUT_LIB:= libneuralnetwork.so
+TEST:= and-perceptron or-perceptron xor-nn
 
 OBJ_DIR:=$(BUILD_DIR)/obj
-
-TARGETS:=common perceptron layer neuralnetwork trainer
-SOURCES:=$(addsuffix .cpp, $(TARGETS))
-OBJECTS:=$(addprefix $(OBJ_DIR)/, $(SOURCES:.cpp=.o))
-OUT_LIB:=$(BUILD_DIR)/libneuralnetwork.so
-TEST:= #TODO: here enumerate the test executables
+OBJECTS:=$(addprefix $(OBJ_DIR)/, $(addsuffix .o, $(SOURCES)))
+OUT_LIB:=$(BUILD_DIR)/$(OUT_LIB)
+TEST:=$(addprefix $(BUILD_DIR)/, $(TEST))
+INCLUDE_DIR:=src/include
 
 
-all: lib #tests
+all: lib test
 
 lib: build_dirs $(OUT_LIB)
+
+test: lib $(TEST)
+
+test-exe: lib test
+	for t in $(BUILD_DIR)/*; do ./$$t; done
+
 
 build_dirs:
 	mkdir -p $(OBJ_DIR)
 
 
-#TEST=$(addprefix $(TEST_DIR), $(TEST))
-#tests: lib
-	#TODO: a loop that compiles and executes tests
-	#TODO: the tests should be compiled inside test dir to link against to link against libneuralnetwork
+$(OUT_LIB): $(OBJECTS)
+	g++ -shared $^ -o $@
 
 
-$(OBJ_DIR)/%.o: %.cpp
+$(OBJECTS): $(OBJ_DIR)/%.o: %.cpp
 	g++ $(FLAGS) -fPIC -c $< -o $@
 
 
-$(OUT_LIB): $(OBJECTS)
-	g++ -shared $^ -o $@
+$(TEST): $(BUILD_DIR)/%: %.cpp
+	g++ $(FLAGS) -I$(INCLUDE_DIR) -L$(BUILD_DIR) $< -lneuralnetwork $(LINKER_FLAGS) -o $@
 
 
 clean:

@@ -1,12 +1,11 @@
-#include "neuralnetwork.cpp"
+#include "neuralnetwork.hpp"
 
-using std::vector;
 
 NeuralNetwork::NeuralNetwork(
     const vector<int>& topology,
     const ActivationType activation_type)
 {
-  layers.reserve(topology.length());
+  layers.reserve(topology.size());
   int ipn = 0;
   for(auto i = topology.cbegin(); i != topology.cend(); i++)
   {
@@ -21,7 +20,7 @@ NeuralNetwork::NeuralNetwork(
 vector<double> NeuralNetwork::predict(const vector<double>& input)
 {
   vector<double> output(input);
-  for(auto l = layers.cbegin(); i != layers.cend(); i++)
+  for(auto l = layers.begin(); l != layers.end(); l++)
   {
     output = l->forward(output, activation_type);
   }

@@ -1,10 +1,43 @@
-#ifndef TRAINER_HPP
-#define TRAINER_HPP
+#ifndef NEURALNETWORK_INTERFACE_HPP
+#define NEURALNETWORK_INTERFACE_HPP
 
-#include "neuralnetwork.hpp"
 #include <vector>
 
 using std::vector;
+
+enum class ActivationType { SIGMOID, TANH, RELU, STEP };
+
+
+class Perceptron {
+public:
+    vector<double> weights;
+    double bias;
+
+    Perceptron(int input_size);
+    double predict(const vector<double>& inputs, ActivationType activation);
+};
+
+
+class Layer {
+public:
+    vector<Perceptron> neurons;
+    vector<double> last_inputs;
+    vector<double> last_outputs;
+
+    Layer(int num_neurons, int inputs_per_neuron);
+    vector<double> forward(const vector<double>& inputs, const ActivationType activation);
+};
+
+
+class NeuralNetwork {
+public:
+  vector<Layer> layers;
+  ActivationType activation_type;
+
+  NeuralNetwork(const vector<int>& topology, const ActivationType activation_type);
+  vector<double> predict(const vector<double>& inputs);
+};
+
 
 class Trainer{
 private:
@@ -27,7 +60,7 @@ public:
       const vector<vector<double>>& training_inputs,
       const vector<double>& training_outputs,
       double learning_rate = 0.1,
-      int max_epochs = 1000,
+      int max_epochs = 20,
       ActivationType activation = ActivationType::STEP);
   
   double test_acc(
