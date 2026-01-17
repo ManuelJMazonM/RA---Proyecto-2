@@ -8,7 +8,7 @@ using std::endl;
 int main()
 {
   vector<vector<double>> dataset_in = { {0.0, 0.0}, {1.0, 0.0}, {0.0, 1.0}, {1.0, 1.0} };
-  vector<double> dataset_out = { 0.0, 0.0, 0.0, 1.0 };
+  vector<int> dataset_out = { 0, 0, 0, 1 };
   Perceptron p(2);
   Trainer t;
 

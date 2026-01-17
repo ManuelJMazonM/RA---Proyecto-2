@@ -2,10 +2,25 @@
 #define NEURALNETWORK_INTERFACE_HPP
 
 #include <vector>
+#include <string>
+#include <map>
+#include <set>
 
 using std::vector;
+using std::string;
+using std::map;
+using std::set;
 
 enum class ActivationType { SIGMOID, TANH, RELU, STEP };
+
+struct Dataset{
+    vector<vector<double>> train_inputs;
+    vector<int> train_targets;
+    vector<vector<double>> val_inputs;
+    vector<int> val_targets;
+    int num_classes;
+    map<int, string> id_to_label;
+};
 
 
 class Perceptron {
@@ -41,32 +56,31 @@ public:
 
 class Trainer{
 private:
-	double learning_rate;
+    double learning_rate;
 
-	vector<vector<double>> computeDeltas(NeuralNetwork& nn, const vector<double>& target);
-	void applyGradients(NeuralNetwork& nn, const vector<vector<double>>& deltas, double eta);
+    vector<vector<double>> computeDeltas(NeuralNetwork& nn, int target_class) const;  // Changed to int
+    void applyGradients(NeuralNetwork& nn, const vector<vector<double>>& deltas, double eta) const;
 
 public:
-	Trainer(double lr = 0.1) : learning_rate(lr){}
+    Trainer(double lr = 0.1) : learning_rate(lr){}
 
-	void train(
-      NeuralNetwork& nn,
-      const vector<vector<double>>& data,
-      const vector<vector<double>>& targets,
-      const int epochs); 
+    double train(
+        NeuralNetwork& nn,
+        const Dataset& ds,
+        const int epochs) const;
 
-  bool train(
-      Perceptron& perceptron,
-      const vector<vector<double>>& training_inputs,
-      const vector<double>& training_outputs,
-      double learning_rate = 0.1,
-      int max_epochs = 20,
-      ActivationType activation = ActivationType::STEP);
-  
-  double test_acc(
-      NeuralNetwork& network,
-      const vector<vector<double>>& test_inputs,
-      const vector<double>& test_outputs);
+    double train(
+        Perceptron& perceptron,
+        const vector<vector<double>>& training_inputs,
+        const vector<int>& training_outputs,
+        double learning_rate = 0.1,
+        int max_epochs = 1000,
+        ActivationType activation = ActivationType::STEP) const;
+    
+    double test_acc(
+        NeuralNetwork& network,
+        const vector<vector<double>>& test_inputs,
+        const vector<int>& test_outputs) const;
 };
 
 #endif

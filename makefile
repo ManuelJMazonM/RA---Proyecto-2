@@ -38,7 +38,7 @@ $(OBJECTS): $(OBJ_DIR)/%.o: %.cpp
 	g++ $(FLAGS) -fPIC -c $< -o $@
 
 
-$(TEST): $(BUILD_DIR)/%: %.cpp
+$(TEST): $(BUILD_DIR)/%: %.cpp lib
 	g++ $(FLAGS) -I$(INCLUDE_DIR) -L$(BUILD_DIR) $< -lneuralnetwork $(LINKER_FLAGS) -o $@
 
 
