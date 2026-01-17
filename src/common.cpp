@@ -39,7 +39,7 @@ namespace Activations {
 	}
 }
 
-Dataset loadDataset(const std::string& filename, int target_col, char delimiter, bool has_header, double val_split){
+Dataset loadDataset(const std::string& filename, size_t target_col, char delimiter, bool has_header, double val_split){
 	Dataset ds;
 	std::vector<std::vector<std::string>> raw_data;
 	std::ifstream file(filename);
@@ -63,37 +63,39 @@ Dataset loadDataset(const std::string& filename, int target_col, char delimiter,
 		}
 	}
 
-	std::shuffle(raw_data.begin(), raw_data.end(), std::mt19937(std::random_device()()));
+	std::set<std::string> unique_labels;
+	for (const auto& row : raw_data){
+		unique_labels.insert(row[target_col]);
+	}
 
 	std::map<std::string, int> label_to_id;
 	int class_counter = 0;
-	for (const auto& row : raw_data){
-		std::string label = row[target_col];
-		if (label_to_id.find(label) == label_to_id.end()){
-			label_to_id[label] = class_counter++;
-		}
+	for (const auto& label : unique_labels){
+		label_to_id[label] = class_counter;
+		ds.id_to_label[class_counter] = label;
+		class_counter++;
 	}
 	ds.num_classes = class_counter;
 
+	std::shuffle(raw_data.begin(), raw_data.end(), std::mt19937(std::random_device()()));
+
 	for (const auto& row : raw_data){
 		std::vector<double> inputs;
-		for (int i=0; i < row.size(); ++i){
+		for (size_t i=0; i < row.size(); ++i){
 			if (i==target_col){
-				continue
+				continue;
 			}
 			inputs.push_back(std::stod(row[i]));
 		}
 
-		std::vector<double> target_vec(ds.num_classes, 0.0);
-		target_vec[label_to_id[row[target_col]]] = 1.0;
+		int class_id = label_to_id[row[target_col]];
 
 		if(ds.val_inputs.size() < raw_data.size() * val_split){
 			ds.val_inputs.push_back(inputs);
-			ds.val_targets.push_back(target_vec);
-		}
-		else{
+			ds.val_targets.push_back(class_id);
+		} else{
 			ds.train_inputs.push_back(inputs);
-			ds.train_targets.push_back(target_vec);
+			ds.train_targets.push_back(class_id);
 		}
 	}
 
