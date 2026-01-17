@@ -19,8 +19,7 @@ public:
 
     double train(
         NeuralNetwork& nn,
-        const vector<vector<double>>& data,
-        const vector<int>& targets,
+        const Dataset& ds,
         const int epochs) const;
 
     double train(

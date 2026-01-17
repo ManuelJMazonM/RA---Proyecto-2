@@ -94,34 +94,30 @@ void Trainer::applyGradients(NeuralNetwork& nn, const std::vector<std::vector<do
 
 double Trainer::train(
     NeuralNetwork& nn,
-    const vector<vector<double>>& train_input,
-    const vector<int>& train_output,
+    const Dataset& ds,
     const int epochs) const
 {
-  if (train_input.empty() || train_input.size() != train_output.size()) {
+  if (ds.train_inputs.empty() || ds.train_inputs.size() != ds.train_targets.size()) {
     cerr << "Error: Invalid training data\n";
     return 0.0;
   }
 
   for (int e = 0; e < epochs; ++e)
   {
-    for (size_t i = 0; i < train_input.size(); ++i)
+    for (size_t i = 0; i < ds.train_inputs.size(); ++i)
     {
-      nn.predict(train_input[i]);
-      vector<vector<double>> deltas = computeDeltas(nn, train_output[i]);
+      nn.predict(ds.train_inputs[i]);
+      vector<vector<double>> deltas = computeDeltas(nn, ds.train_targets[i]);
       applyGradients(nn, deltas, learning_rate); 
     }
+
+    if (!ds.val_inputs.empty() && (e%10 == 0 || e == epochs-1)){
+      double v_acc = test_acc(nn, ds.val_inputs, ds.val_targets);
+      cout << "Epoca " << e << "| Prec. Validacion: " << v_acc << "%" << endl;
+    }  
   }
 
-  double hits = 0;
-  for(size_t i = 0; i < train_input.size(); i++)
-  {
-    if(nn.predict(train_input[i]) == train_output[i]) hits++;
-  }
-  
-  double accuracy = hits / static_cast<double>(train_output.size());
-  cout << "Training Accuracy: " << (accuracy * 100.0) << "%\n";
-  return accuracy;
+  return test_acc(nn, ds.train_inputs, ds.train_targets); 
 }
 
 
