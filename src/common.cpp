@@ -6,6 +6,7 @@
 #include <sstream>
 #include <random>
 #include <map>
+#include <limits>
 
 namespace Activations {
 	double apply(double s, ActivationType type) {
@@ -79,25 +80,51 @@ Dataset loadDataset(const std::string& filename, size_t target_col, char delimit
 
 	std::shuffle(raw_data.begin(), raw_data.end(), std::mt19937(std::random_device()()));
 
-	for (const auto& row : raw_data){
-		std::vector<double> inputs;
-		for (size_t i=0; i < row.size(); ++i){
-			if (i==target_col){
-				continue;
-			}
-			inputs.push_back(std::stod(row[i]));
-		}
 
-		int class_id = label_to_id[row[target_col]];
+	size_t num_samples = raw_data.size();
+	size_t num_features = raw_data[0].size() -1;
 
-		if(ds.val_inputs.size() < raw_data.size() * val_split){
-			ds.val_inputs.push_back(inputs);
-			ds.val_targets.push_back(class_id);
-		} else{
-			ds.train_inputs.push_back(inputs);
-			ds.train_targets.push_back(class_id);
-		}
-	}
+	std::vector<std::vector<double>> all_inputs(num_samples, std::vector<double>(num_features));
+	std::vector<int> all_targets(num_samples);
+
+	std::vector<double> min_vals(num_features, std::numeric_limits<double>::max());
+	std::vector<double> max_vals(num_features, std::numeric_limits<double>::lowest());
+
+	for (size_t i = 0; i < num_samples; ++i) {
+        size_t feat_idx = 0;
+        for (size_t j = 0; j < raw_data[i].size(); ++j) {
+            if (j == target_col) {
+                all_targets[i] = label_to_id[raw_data[i][j]];
+                continue;
+            }
+            double val = std::stod(raw_data[i][j]);
+            all_inputs[i][feat_idx] = val;
+            
+            if (val < min_vals[feat_idx]) min_vals[feat_idx] = val;
+            if (val > max_vals[feat_idx]) max_vals[feat_idx] = val;
+            feat_idx++;
+        }
+    }
+
+    for (size_t i = 0; i < num_samples; ++i) {
+        for (size_t j = 0; j < num_features; ++j) {
+            double range = max_vals[j] - min_vals[j];
+            if (range > 0.0) {
+                all_inputs[i][j] = (all_inputs[i][j] - min_vals[j]) / range;
+            }
+        }
+    }
+
+    size_t val_limit = static_cast<size_t>(num_samples * val_split);
+    for (size_t i = 0; i < num_samples; ++i) {
+        if (ds.val_inputs.size() < val_limit) {
+            ds.val_inputs.push_back(all_inputs[i]);
+            ds.val_targets.push_back(all_targets[i]);
+        } else {
+            ds.train_inputs.push_back(all_inputs[i]);
+            ds.train_targets.push_back(all_targets[i]);
+        }
+    }
 
 	return ds;
 }

@@ -113,7 +113,7 @@ double Trainer::train(
 
     if (!ds.val_inputs.empty() && (e%10 == 0 || e == epochs-1)){
       double v_acc = test_acc(nn, ds.val_inputs, ds.val_targets);
-      cout << "Epoca " << e << "| Prec. Validacion: " << v_acc << "%" << endl;
+      cout << "Epoca " << e << "| Prec. Validacion: " << v_acc << "%" << std::endl;
     }  
   }
 
