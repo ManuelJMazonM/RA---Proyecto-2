@@ -10,15 +10,26 @@ vector<vector<double>> Trainer::computeDeltas(NeuralNetwork& nn, const vector<do
 	int num_neurons_L = nn.layers[L].neurons.size(); 
 	deltas[L].resize(num_neurons_L);
 
+<<<<<<< Updated upstream
 	for (int j=0; j < num_neurons; ++j){
 		double x_j_L = nn.layers[L].last_outputs[j]; //¿Puede acceder a esta variable?
+=======
+	for (int j=0; j < num_neurons_L; ++j)
+    {
+		double x_j_L = nn.layers[L].last_outputs[j];
+>>>>>>> Stashed changes
 		double error_derivative = 2.0 * (x_j_L - target[j]);
 		double theta_prime = Activations::applyDerivative(x_j_L, activation);
 
 		deltas[L][j] = theta_prime * error_derivative;
 	}
 
+<<<<<<< Updated upstream
 	for (int l = L -1; l >= 0; --l){
+=======
+	for (int l = L -1; l >= 0; l--)
+    {
+>>>>>>> Stashed changes
 		int num_neurons_l = nn.layers[l].neurons.size();
 		deltas[l].resize(num_neurons_l);
 
@@ -43,9 +54,14 @@ vector<vector<double>> Trainer::computeDeltas(NeuralNetwork& nn, const vector<do
 void Trainer::train(
     NeuralNetwork& nn,
     const vector<vector<double>>& data,
+<<<<<<< Updated upstream
 		const vector<vector<double>>& targets,
     int epochs,
     ActivationType activation)
+=======
+	const vector<vector<double>>& targets,
+    const int epochs)
+>>>>>>> Stashed changes
 {
 	for (int e=0; e < epochs; ++e){
 		double total_error = 0.0;
