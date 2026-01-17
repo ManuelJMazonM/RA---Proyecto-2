@@ -128,7 +128,7 @@ double Trainer::train(
 double Trainer::train(
     Perceptron& perceptron,
     const vector<vector<double>>& training_inputs,
-    const vector<int>& training_outputs,  // Changed to int
+    const vector<int>& training_outputs,
     double learning_rate,
     int max_epochs,
     ActivationType activation) const
@@ -167,8 +167,7 @@ double Trainer::train(
     }
   }
 
-  // Calculate accuracy
-  int correct = 0;
+  int hits = 0;
   for (size_t i = 0; i < training_inputs.size(); ++i) {
     double prediction = perceptron.predict(training_inputs[i], activation);
     int predicted_class;
@@ -182,11 +181,11 @@ double Trainer::train(
     }
     
     if (predicted_class == training_outputs[i]) {
-      correct++;
+      hits++;
     }
   }
 
-  double accuracy = 100.0 * correct / training_inputs.size();
+  double accuracy = 100.0 * hits / training_inputs.size();
   return accuracy;
 }
 
@@ -200,12 +199,12 @@ double Trainer::test_acc(
     return 0.0;
   }
 
-  int correct = 0;
+  int hits = 0;
   for (size_t i = 0; i < test_inputs.size(); ++i) {
     if (network.predict(test_inputs[i]) == test_outputs[i]) {
-      correct++;
+      hits++;
     }
   }
 
-  return 100.0 * correct / test_inputs.size();
+  return 100.0 * hits / test_inputs.size();
 }
