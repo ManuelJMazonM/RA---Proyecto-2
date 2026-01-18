@@ -20,9 +20,18 @@ NeuralNetwork::NeuralNetwork(
 int NeuralNetwork::predict(const vector<double>& input)
 {
   vector<double> output(input);
-  for(auto l = layers.begin(); l != layers.end(); l++)
+  
+  // La primera capa actúa como "capa de entrada" (sin pesos reales)
+  // Solo guardamos los inputs para backprop
+  if (!layers.empty()) {
+    layers[0].last_inputs = input;
+    layers[0].last_outputs = input;
+  }
+  
+  // Forward pass empieza desde la segunda capa (índice 1)
+  for(size_t i = 1; i < layers.size(); i++)
   {
-    output = l->forward(output, activation_type);
+    output = layers[i].forward(output, activation_type);
   }
 
   return predicted_class();

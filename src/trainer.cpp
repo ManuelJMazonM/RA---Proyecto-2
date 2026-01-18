@@ -49,7 +49,7 @@ vector<vector<double>> Trainer::computeDeltas(NeuralNetwork& nn, int target_clas
     deltas[L][j] = theta_prime * error_derivative;
   }
 
-  for (int l = L - 1; l >= 0; l--)
+  for (int l = L - 1; l >= 1; l--)  // Empezar desde 1, no desde 0 (la capa 0 es entrada)
   {
     int num_neurons_l = nn.layers[l].neurons.size();
     deltas[l].resize(num_neurons_l);
@@ -74,7 +74,8 @@ vector<vector<double>> Trainer::computeDeltas(NeuralNetwork& nn, int target_clas
 
 void Trainer::applyGradients(NeuralNetwork& nn, const std::vector<std::vector<double>>& deltas, double eta) const
 {
-  for (size_t l = 0; l < nn.layers.size(); ++l){
+  // Empezar desde capa 1 (la capa 0 es la capa de entrada, sin pesos entrenables)
+  for (size_t l = 1; l < nn.layers.size(); ++l){
     Layer& layer = nn.layers[l];
 
     for (size_t j = 0; j < layer.neurons.size(); ++j){

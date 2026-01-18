@@ -128,4 +128,3 @@ Dataset loadDataset(const std::string& filename, size_t target_col, char delimit
 
 	return ds;
 }
-
