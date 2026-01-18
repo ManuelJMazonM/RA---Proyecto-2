@@ -1,93 +1,56 @@
-.PHONY: clean all lib test experimentos
+.PHONY: clean all lib test
 
 VPATH=src test
 FLAGS:=-g -Wall -Werror
 BUILD_DIR:=build
-OBJ_DIR:=$(BUILD_DIR)/obj
-INCLUDE_DIR:=src/include
-
-# Archivos fuente
 SOURCES:= common perceptron layer neuralnetwork trainer
+TEST:= and-perceptron or-perceptron xor-nn experimentos_datasets experimentos_rapidos
+
+OBJ_DIR:=$(BUILD_DIR)/obj
 OBJECTS:=$(addprefix $(OBJ_DIR)/, $(addsuffix .o, $(SOURCES)))
+TEST:=$(addprefix $(BUILD_DIR)/, $(TEST))
+INCLUDE_DIR:=src/include
 
 # Detectar sistema operativo
 ifeq ($(OS),Windows_NT)
-    # Windows: libreria estatica, ejecutables con .exe
+    # Windows: libreria estatica
     OUT_LIB:=$(BUILD_DIR)/libneuralnetwork.a
-    EXE_EXT:=.exe
-    LINK_FLAGS:=
+    LINK_CMD = g++ $(FLAGS) -I$(INCLUDE_DIR) $< $(OUT_LIB) -o $@
+    LIB_CMD = ar rcs $@ $^
 else
-    # Linux: libreria dinamica con rpath
+    # Linux: libreria dinamica
     OUT_LIB:=$(BUILD_DIR)/libneuralnetwork.so
-    EXE_EXT:=
-    LINK_FLAGS:=-Wl,-rpath,'$$ORIGIN'
+    LINKER_FLAGS:=-Wl,-rpath,'$$ORIGIN'
+    LINK_CMD = g++ $(FLAGS) -I$(INCLUDE_DIR) -L$(BUILD_DIR) $< -lneuralnetwork $(LINKER_FLAGS) -o $@
+    LIB_CMD = g++ -shared $^ -o $@
 endif
 
 
 all: lib test
-	@echo "Compilacion completada en $(if $(filter Windows_NT,$(OS)),Windows,Linux)!"
 
 lib: build_dirs $(OUT_LIB)
-	@echo "Libreria creada: $(OUT_LIB)"
 
-test: lib $(BUILD_DIR)/and-perceptron$(EXE_EXT)
-	@echo "Tests compilados!"
+test: lib $(TEST)
+
+test-exe: lib test
+	for t in $(BUILD_DIR)/*; do ./$$t; done
 
 
 build_dirs:
-	@mkdir -p $(OBJ_DIR)
+	mkdir -p $(OBJ_DIR)
 
 
-# Crear libreria (estatica en Windows, dinamica en Linux)
-ifeq ($(OS),Windows_NT)
 $(OUT_LIB): $(OBJECTS)
-	ar rcs $@ $^
-else
-$(OUT_LIB): $(OBJECTS)
-	g++ -shared $^ -o $@
-endif
+	$(LIB_CMD)
 
 
-# Compilar objetos
-$(OBJ_DIR)/common.o: src/common.cpp
-	g++ $(FLAGS) -fPIC -I$(INCLUDE_DIR) -c $< -o $@
-
-$(OBJ_DIR)/perceptron.o: src/perceptron.cpp
-	g++ $(FLAGS) -fPIC -I$(INCLUDE_DIR) -c $< -o $@
-
-$(OBJ_DIR)/layer.o: src/layer.cpp
-	g++ $(FLAGS) -fPIC -I$(INCLUDE_DIR) -c $< -o $@
-
-$(OBJ_DIR)/neuralnetwork.o: src/neuralnetwork.cpp
-	g++ $(FLAGS) -fPIC -I$(INCLUDE_DIR) -c $< -o $@
-
-$(OBJ_DIR)/trainer.o: src/trainer.cpp
+$(OBJECTS): $(OBJ_DIR)/%.o: %.cpp
 	g++ $(FLAGS) -fPIC -I$(INCLUDE_DIR) -c $< -o $@
 
 
-# Compilar test
-$(BUILD_DIR)/and-perceptron$(EXE_EXT): test/and-perceptron.cpp $(OUT_LIB)
-ifeq ($(OS),Windows_NT)
-	g++ $(FLAGS) -I$(INCLUDE_DIR) $< $(OUT_LIB) -o $@
-else
-	g++ $(FLAGS) -I$(INCLUDE_DIR) -L$(BUILD_DIR) $< -lneuralnetwork $(LINK_FLAGS) -o $@
-endif
-
-
-# Compilar experimentos
-experimentos: lib
-ifeq ($(OS),Windows_NT)
-	g++ -O2 -Wall -I$(INCLUDE_DIR) test/experimentos_rapidos.cpp $(OUT_LIB) -o $(BUILD_DIR)/experimentos_rapidos.exe
-	@echo "Ejecuta: build\\experimentos_rapidos.exe"
-else
-	g++ -O2 -Wall -I$(INCLUDE_DIR) -L$(BUILD_DIR) test/experimentos_rapidos.cpp -lneuralnetwork $(LINK_FLAGS) -o $(BUILD_DIR)/experimentos_rapidos
-	@echo "Ejecuta: ./build/experimentos_rapidos"
-endif
+$(TEST): $(BUILD_DIR)/%: %.cpp lib
+	$(LINK_CMD)
 
 
 clean:
-ifeq ($(OS),Windows_NT)
-	@if exist $(BUILD_DIR) rmdir /s /q $(BUILD_DIR)
-else
 	rm -rf $(BUILD_DIR)
-endif
